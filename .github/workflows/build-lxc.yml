@@ -1,0 +1,60 @@
+name: Build LXC Image
+
+on:
+  # to trigger on demand
+  workflow_dispatch:
+  # to trigger on schedule
+  schedule:
+    - cron: '0 0 1 * *'
+  push:
+    branches:
+      - main
+
+jobs:
+  build-lxc:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Install Distrobuilder
+      run: sudo snap install distrobuilder --classic
+
+    - name: Build LXC
+      run: |
+        distrobuilder build-lxc scheme.yaml
+
+    - name: Create a version tag
+      id: create_tag
+      run: |
+        TAG_NAME="v$(date +'%Y.%m.01')"
+        echo "Generated TAG_NAME: $TAG_NAME"
+        echo "tag_name=$TAG_NAME" >> $GITHUB_ENV
+
+    - name: Create GitHub Release
+      id: create_release
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        curl -X POST \
+          -H "Authorization: token $GITHUB_TOKEN" \
+          -H "Content-Type: application/json" \
+          -d '{
+                "tag_name": "'"${{ env.TAG_NAME }}"'",
+                "name": "'"${{ env.TAG_NAME }}"'",
+                "body": "Automated release for ${TAG_NAME}",
+                "draft": false,
+                "prerelease": false
+              }' \
+          https://api.github.com/repos/${{ github.repository }}/releases
+
+    - name: Upload LXC image to release
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: out/*.tar.gz
+        asset_name: debian-lxc-${{ env.TAG_NAME }}.tar.gz
+        asset_content_type: application/gzip
