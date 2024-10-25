@@ -49,6 +49,7 @@ jobs:
 
     - name: Build LXC
       run: |
+        mkdir -p out
         sudo distrobuilder build-lxc ${{ env.DISTRO_RELEASE }}.yaml /tmp/${{ env.RELEASE_NAME }}
 
     - name: Combine distrobuilder outputs into single archive
