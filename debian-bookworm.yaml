@@ -28,6 +28,11 @@ packages:
         - logrotate
       action: install
 
+files:
+  - path: /root/.ssh/authorized_keys
+    generator: copy
+    source: assets/authorized_keys
+
 actions:
   - trigger: post-packages
     action: |
