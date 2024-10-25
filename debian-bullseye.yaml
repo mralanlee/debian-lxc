@@ -31,8 +31,9 @@ packages:
       action: install
 
 actions:
-  - trigger: post-files
+  - trigger: post-install
     action: |
+      #!/bin/sh
       echo "Setting up SSH"
       mkdir -p /root/.ssh
       chmod 700 /root/.ssh
