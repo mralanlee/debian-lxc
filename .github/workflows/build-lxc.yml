@@ -30,33 +30,36 @@ jobs:
       run: sudo snap install distrobuilder --classic
 
     - name: Create a version tag
-      id: create_tag
+      outputs:
+        tag_name: ${{ steps.create_tag.outputs.TAG_NAME }}
+        release_name: ${{ steps.create_tag.outputs.RELEASE_NAME }}
       run: |
         TAG_NAME="$(date +'%Y.%m.01')"
         echo "Generated TAG_NAME: $TAG_NAME"
-        echo "tag_name=$TAG_NAME" >> $GITHUB_ENV
-        echo "release_name=${{ env.DISTRO_RELEASE}}-${TAG_NAME}" >> $GITHUB_ENV
+        echo "tag_name=$TAG_NAME" >> $GITHUB_OUTPUT
+        echo "release_name=${{ env.DISTRO_RELEASE}}-${TAG_NAME}" >> $GITHUB_OUTPUT
 
     - name: Build LXC
+      needs: [create_tag]
       run: |
-        sudo distrobuilder build-lxc ${{ env.DISTRO_RELEASE }}.yaml out/${{ env.RELEASE_NAME }}.tar.gz
+        sudo distrobuilder build-lxc ${{ env.DISTRO_RELEASE }}.yaml out/${{ steps.create_tag.outputs.release_name }}.tar.gz
 
     - name: Upload LXC artifact
       uses: actions/upload-artifact@v3
       with:
         name: debian-lxc-image
-        path: out/${{ env.RELEASE_NAME }}.tar.gz  # Path to the LXC image built by distrobuilder
+        path: out/${{ steps.create_tag.outputs.release_name }}.tar.gz  # Path to the LXC image built by distrobuilder
 
     - name: Bump version and push tag
       id: tag_version
       uses: mathieudutour/github-tag-action@v6.2
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
-        custom_tag: ${{ env.TAG_NAME }}
+        custom_tag: ${{ steps.create_tag.outputs.tag_name }}
 
     - name: Create a GitHub release
       uses: ncipollo/release-action@v1
       with:
         tag: ${{ steps.tag_version.outputs.new_tag }}
-        name: Release ${{ env.TAG_NAME }}
+        name: ${{ steps.tag_version.outputs.new_tag }}
         artifacts: debian-lxc-image
