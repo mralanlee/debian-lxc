@@ -36,35 +36,23 @@ jobs:
     - name: Create a version tag
       id: create_tag
       run: |
-        TAG_NAME="v$(date +'%Y.%m.01')"
+        TAG_NAME="$(date +'%Y.%m.01')"
         echo "Generated TAG_NAME: $TAG_NAME"
         echo "tag_name=$TAG_NAME" >> $GITHUB_ENV
 
-    - name: Create a git tag
-      env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      run: |
-        git config user.name "github-actions[bot]"
-        git config user.email "github-actions[bot]@users.noreply.github.com"
-        git tag ${{ env.TAG_NAME }}
-        git push origin ${{ env.TAG_NAME }}
+    - name: Bump version and push tag
+      id: tag_version
+      uses: mathieudutour/github-tag-action@v6.2
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        custom_tag: ${{ env.TAG_NAME}}
+        tag_prefix: v
 
-    - name: Create GitHub Release
-      id: create_release
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      run: |
-        curl -X POST \
-          -H "Authorization: token $GITHUB_TOKEN" \
-          -H "Content-Type: application/json" \
-          -d '{
-                "tag_name": "'"${{ env.TAG_NAME }}"'",
-                "name": "'"${{ env.TAG_NAME }}"'",
-                "body": "Automated release for ${TAG_NAME}",
-                "draft": false,
-                "prerelease": false
-              }' \
-          https://api.github.com/repos/${{ github.repository }}/releases
+    - name: Create a GitHub release
+      uses: ncipollo/release-action@v1
+      with:
+        tag: ${{ steps.tag_version.outputs.new_tag }}
+        name: Release ${{ env.TAG_NAME }}
 
     - name: Upload LXC image to release
       uses: actions/upload-release-asset@v1
