@@ -30,6 +30,7 @@ jobs:
       run: sudo snap install distrobuilder --classic
 
     - name: Create a version tag
+      id: create_tag
       outputs:
         tag_name: ${{ steps.create_tag.outputs.TAG_NAME }}
         release_name: ${{ steps.create_tag.outputs.RELEASE_NAME }}
@@ -40,7 +41,6 @@ jobs:
         echo "release_name=${{ env.DISTRO_RELEASE}}-${TAG_NAME}" >> $GITHUB_OUTPUT
 
     - name: Build LXC
-      needs: [create_tag]
       run: |
         sudo distrobuilder build-lxc ${{ env.DISTRO_RELEASE }}.yaml out/${{ steps.create_tag.outputs.release_name }}.tar.gz
 
