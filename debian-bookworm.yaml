@@ -1,0 +1,48 @@
+image:
+  distribution: debian
+  release: bookworm
+  architecture: amd64
+  description: |
+    Custom Debian LXC image for Proxmox
+
+source:
+  downloader: debootstrap
+  url: http://deb.debian.org/debian
+  variant: minbase
+
+targets:
+  lxc:
+    create_message: "Debian LXC container created"
+
+packages:
+  manager: apt
+  update: true
+  sets:
+    - packages:
+        - python3
+        - sudo
+        - openssh-server
+        - unattended-upgrades
+        - rsyslog
+        - systemd-timesyncd
+        - logrotate
+      action: install
+
+actions:
+  - trigger: post-packages
+    action: |
+      #!/bin/sh
+      echo "Configuring unattended upgrades"
+      apt-get clean
+      dpkg-reconfigure --priority=low unattended-upgrades
+
+      echo "Creating ansible user with sudo privileges"
+
+      # Create the ansible user and set up passwordless sudo
+      useradd -m -s /bin/bash ansible
+      echo "ansible ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/ansible
+
+      # Create .ssh directory for ansible user
+      mkdir -p /home/ansible/.ssh
+      chmod 700 /home/ansible/.ssh
+      chown -R ansible:ansible /home/ansible/.ssh
