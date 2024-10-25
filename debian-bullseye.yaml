@@ -3,7 +3,7 @@ image:
   release: bullseye
   architecture: amd64
   description: |
-    Custom Debian LXC image for Proxmox with SSH keys
+    Custom Debian LXC image for Proxmox
 
 source:
   downloader: debootstrap
@@ -12,8 +12,11 @@ source:
 
 targets:
   lxc:
-    create-message: "Debian LXC container created"
-    variant: default
+    create_message: "Debian LXC container created"
+  config:
+    - type: all
+      content: |-
+        lxc.arch = {{ image.architecture_personality }}
 
 packages:
   manager: apt
