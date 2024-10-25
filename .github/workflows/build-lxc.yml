@@ -9,6 +9,8 @@ on:
   push:
     branches:
       - main
+env:
+  DISTRO_RELEASE: 'debian-bookworm'
 
 jobs:
   build-lxc:
@@ -26,7 +28,7 @@ jobs:
 
     - name: Build LXC
       run: |
-        sudo distrobuilder build-lxc debian-bullseye.yaml
+        sudo distrobuilder build-lxc ${{ env.DISTRO_RELEASE }}.yaml
 
     - name: Create a version tag
       id: create_tag
@@ -59,5 +61,5 @@ jobs:
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
         asset_path: out/*.tar.gz
-        asset_name: debian-lxc-${{ env.TAG_NAME }}.tar.gz
+        asset_name: debian-${{ env.DISTRO_RELEASE }}-lxc-${{ env.TAG_NAME }}.tar.gz
         asset_content_type: application/gzip
