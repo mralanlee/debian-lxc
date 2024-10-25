@@ -39,9 +39,3 @@ actions:
       cp /authorized_keys /root/.ssh/authorized_keys
       chmod 600 /root/.ssh/authorized_keys
       systemctl enable ssh
-
-files:
-  - path: /authorized_keys
-    content: |
-      ssh-rsa AAAAB3... your-first-public-key
-      ssh-rsa AAAAB3... your-second-public-key
