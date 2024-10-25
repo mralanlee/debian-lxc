@@ -54,7 +54,7 @@ jobs:
 
     - name: Combine distrobuilder outputs into single archive
       run: |
-        tar -cvf out/${{ env.RELEASE_NAME }}.tar.xz -C /tmp/${{ env.RELEASE_NAME }}/*.tar.xz .
+        tar -cvf out/${{ env.RELEASE_NAME }}.tar.xz -C /tmp/${{ env.RELEASE_NAME }}/* .
 
     - name: Bump version and push tag
       id: tag_version
