@@ -1,0 +1,40 @@
+image:
+  distribution: debian
+  release: bullseye
+  architecture: amd64
+  description: |
+    Custom Debian LXC image for Proxmox with SSH keys
+
+source:
+  downloader: debootstrap
+  url: http://deb.debian.org/debian
+  variant: minbase
+
+targets:
+  lxc:
+    create-message: "Debian LXC container created"
+    variant: default
+
+packages:
+  manager: apt
+  update: true
+  install:
+    - openssh-server
+    - curl
+    - sudo
+
+actions:
+  - trigger: post-files
+    action: |
+      echo "Setting up SSH"
+      mkdir -p /root/.ssh
+      chmod 700 /root/.ssh
+      cp /authorized_keys /root/.ssh/authorized_keys
+      chmod 600 /root/.ssh/authorized_keys
+      systemctl enable ssh
+
+files:
+  - path: /authorized_keys
+    content: |
+      ssh-rsa AAAAB3... your-first-public-key
+      ssh-rsa AAAAB3... your-second-public-key
