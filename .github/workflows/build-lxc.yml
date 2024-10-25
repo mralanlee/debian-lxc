@@ -23,7 +23,7 @@ jobs:
 
     - name: Build LXC
       run: |
-        distrobuilder build-lxc debian-bullseye.yaml
+        sudo distrobuilder build-lxc debian-bullseye.yaml
 
     - name: Create a version tag
       id: create_tag
