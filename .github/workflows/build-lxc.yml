@@ -33,7 +33,7 @@ jobs:
   build-lxc:
     runs-on: ubuntu-latest
     needs: create_tag
-    environment:
+    env:
       RELEASE_NAME: ${{ needs.create_tag.outputs.release_name }}
       TAG_NAME: ${{ needs.create_tag.outputs.tag_name }}
 
