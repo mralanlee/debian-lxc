@@ -49,13 +49,13 @@ jobs:
 
     - name: Build LXC
       run: |
-        sudo distrobuilder build-lxc ${{ env.DISTRO_RELEASE }}.yaml "out/${{ env.RELEASE_NAME }}.tar.gz"
+        sudo distrobuilder build-lxc ${{ env.DISTRO_RELEASE }}.yaml out/${{ env.RELEASE_NAME }}
 
     - name: Upload LXC artifact
       uses: actions/upload-artifact@v3
       with:
         name: debian-lxc-image
-        path: "out/${{ env.RELEASE_NAME }}.tar.gz"  # Path to the LXC image built by distrobuilder
+        path: out/${{ env.RELEASE_NAME }}  # Path to the LXC image built by distrobuilder
 
     - name: Bump version and push tag
       id: tag_version
