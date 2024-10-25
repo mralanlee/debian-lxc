@@ -13,18 +13,22 @@ source:
 targets:
   lxc:
     create_message: "Debian LXC container created"
-  config:
-    - type: all
-      content: |-
-        lxc.arch = {{ image.architecture_personality }}
 
 packages:
   manager: apt
   update: true
-  install:
-    - openssh-server
-    - curl
-    - sudo
+  sets:
+    - packages:
+        - openssh-server
+      action: install
+
+    - packages:
+        - curl
+      action: install
+
+    - packages:
+        - vim
+      action: install
 
 actions:
   - trigger: post-files
