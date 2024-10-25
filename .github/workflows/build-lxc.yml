@@ -12,6 +12,9 @@ on:
 env:
   DISTRO_RELEASE: 'debian-bookworm'
 
+permissions:
+  contents: write
+
 jobs:
   build-lxc:
     runs-on: ubuntu-latest
