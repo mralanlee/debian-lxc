@@ -35,7 +35,7 @@ jobs:
         TAG_NAME="$(date +'%Y.%m.01')"
         echo "Generated TAG_NAME: $TAG_NAME"
         echo "tag_name=$TAG_NAME" >> $GITHUB_ENV
-        echo "release_name=debian-${{ env.DISTRO_RELEASE}}-${{ env.TAG_NAME}}" >> $GITHUB_ENV
+        echo "release_name=${{ env.DISTRO_RELEASE}}-${TAG_NAME}" >> $GITHUB_ENV
 
     - name: Build LXC
       run: |
