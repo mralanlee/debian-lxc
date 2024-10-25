@@ -29,16 +29,23 @@ jobs:
     - name: Install Distrobuilder
       run: sudo snap install distrobuilder --classic
 
-    - name: Build LXC
-      run: |
-        sudo distrobuilder build-lxc ${{ env.DISTRO_RELEASE }}.yaml
-
     - name: Create a version tag
       id: create_tag
       run: |
         TAG_NAME="$(date +'%Y.%m.01')"
         echo "Generated TAG_NAME: $TAG_NAME"
         echo "tag_name=$TAG_NAME" >> $GITHUB_ENV
+        echo "release_name=debian-${{ env.DISTRO_RELEASE}}-${{ env.TAG_NAME}}" >> $GITHUB_ENV
+
+    - name: Build LXC
+      run: |
+        sudo distrobuilder build-lxc ${{ env.DISTRO_RELEASE }}.yaml out/${{ env.RELEASE_NAME }}.tar.gz
+
+    - name: Upload LXC artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: debian-lxc-image
+        path: out/${{ env.RELEASE_NAME }}.tar.gz  # Path to the LXC image built by distrobuilder
 
     - name: Bump version and push tag
       id: tag_version
@@ -53,13 +60,4 @@ jobs:
       with:
         tag: ${{ steps.tag_version.outputs.new_tag }}
         name: Release ${{ env.TAG_NAME }}
-
-    - name: Upload LXC image to release
-      uses: actions/upload-release-asset@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: out/*.tar.gz
-        asset_name: debian-${{ env.DISTRO_RELEASE }}-lxc-${{ env.TAG_NAME }}.tar.gz
-        asset_content_type: application/gzip
+        artifacts: debian-lxc-image
