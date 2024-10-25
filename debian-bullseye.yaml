@@ -31,7 +31,7 @@ packages:
       action: install
 
 actions:
-  - trigger: post-install
+  - trigger: post-packages
     action: |
       #!/bin/sh
       echo "Setting up SSH"
