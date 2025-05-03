@@ -19,13 +19,20 @@ packages:
   update: true
   sets:
     - packages:
-        - python3
-        - sudo
-        - openssh-server
-        - unattended-upgrades
-        - rsyslog
-        - systemd-timesyncd
-        - logrotate
+      - curl
+      - ca-certificates
+      - python3
+      - ripgrep
+      - vim
+      - git
+      - htop
+      - jq
+      - sudo
+      - openssh-server
+      - unattended-upgrades
+      - rsyslog
+      - systemd-timesyncd
+      - logrotate
       action: install
 
 files:
